@@ -54,6 +54,7 @@ long_mode_start [64-bit]                          null segment registers
 
 ```
 sha256sum kernel.iso
+3f51ee47be5fac42553f98070f021153beca379b443ae8b5c69b4bdc812b85ef  kernel.iso
 ```
 
 ## Boot screenshot
