@@ -8,9 +8,9 @@
 
 | Name | Role |
 |------|------|
-| | |
-| | |
-| | |
+| Cesar Arciniegas | Part 3 |
+| Emilio Cuenca | Part 2 |
+| Ariel Guerrero | Part 1 |
 
 ---
 
