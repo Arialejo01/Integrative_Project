@@ -20,13 +20,20 @@ cubic
 
 ```
 part1-distro/
-├── README.md                  # This file
+├── README.md                        # This file
+├── chroot-setup.sh                  # All chroot commands applied inside Cubic
+├── skel/
+│   └── .config/
+│       ├── nvim/
+│       │   └── init.vim             # Neovim config deployed to /etc/skel
+│       └── gtk-3.0/
+│           └── settings.ini         # GTK dark theme deployed to /etc/skel
 └── screenshots/
-    ├── 01-boot-screen.png     # GRUB / boot splash
-    ├── 02-desktop.png         # Live desktop after boot
-    ├── 03-librewolf.png       # LibreWolf replacing Firefox
-    ├── 04-neovim.png          # Neovim pre-installed
-    └── 05-dark-theme.png      # Mint-Y-Dark applied by default
+    ├── 01-boot-screen.png
+    ├── 02-desktop.png
+    ├── 03-librewolf.png
+    ├── 04-neovim.png
+    └── 05-dark-theme.png
 ```
 
 ## Base ISO
@@ -44,7 +51,7 @@ part1-distro/
 ### 1 — Firefox → LibreWolf
 
 ```bash
-add-apt-repository ppa:mozillateam/ppa
+add-apt-repository ppa:mozillateam/ppa -y
 apt update
 apt remove --purge firefox -y
 apt install librewolf -y
@@ -59,16 +66,16 @@ apt install librewolf -y
 ```bash
 apt install neovim -y
 mkdir -p /etc/skel/.config/nvim
-cat > /etc/skel/.config/nvim/init.vim << 'EOF'
+cat > /etc/skel/.config/nvim/init.vim << 'VIMEOF'
 set number
 set tabstop=4
 set shiftwidth=4
 set expandtab
 syntax on
-EOF
+VIMEOF
 ```
 
-**Why:** Neovim is a lightweight keyboard-driven editor standard in developer environments. Placing the config in `/etc/skel` ensures every new user account inherits it automatically — demonstrating persistent skel-based customization.
+**Why:** Neovim is a lightweight keyboard-driven editor standard in developer environments. Placing the config in `/etc/skel` ensures every new user account inherits it automatically.
 
 ---
 
@@ -76,29 +83,27 @@ EOF
 
 ```bash
 mkdir -p /etc/skel/.config/gtk-3.0
-cat > /etc/skel/.config/gtk-3.0/settings.ini << 'EOF'
+cat > /etc/skel/.config/gtk-3.0/settings.ini << 'GTKEOF'
 [Settings]
 gtk-application-prefer-dark-theme=1
 gtk-theme-name=Mint-Y-Dark
 gtk-icon-theme-name=Mint-Y-Dark
-EOF
+GTKEOF
 ```
 
-**Why:** The default Mint theme applies only to the live session. Writing to `/etc/skel` makes the dark theme the permanent default for every user created after installation — without requiring any manual configuration.
+**Why:** The default Mint theme applies only to the live session. Writing to `/etc/skel` makes the dark theme permanent for every user created after installation.
 
 ---
 
 ## Build flow
 
 ```
-Base ISO (Linux Mint 22.1)
+Base ISO (Linux Mint 22.1 Cinnamon)
   └─ Cubic: extract squashfs
-        ├─ chroot terminal
-        │    ├─ add-apt-repository (LibreWolf PPA)
-        │    ├─ apt remove firefox / apt install librewolf
-        │    ├─ apt install neovim
-        │    ├─ write /etc/skel/.config/nvim/init.vim
-        │    └─ write /etc/skel/.config/gtk-3.0/settings.ini
+        ├─ chroot terminal  ←  run chroot-setup.sh
+        │    ├─ [1/3] add PPA → remove Firefox → install LibreWolf
+        │    ├─ [2/3] install Neovim → write /etc/skel/.config/nvim/init.vim
+        │    └─ [3/3] write /etc/skel/.config/gtk-3.0/settings.ini
         └─ Cubic: repack squashfs (XZ) → generate ISO
                         │
                         ▼
@@ -127,4 +132,3 @@ sha256sum ArielOS-22.1-amd64.iso
 ## Boot screenshot
 
 *(add after QEMU test)*
-
